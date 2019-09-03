@@ -5,5 +5,5 @@ setup(
     version='b1.3',
     packages=['aes'],
     scripts=['aes/scripts/aes.py'],
-    install_requires=['cryptography']
+    install_requires=['cryptography', 'pytest']
 )
