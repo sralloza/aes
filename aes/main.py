@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 from cryptography.fernet import InvalidToken
 
-from .encryption import encrypt, decrypt
+from .files import encrypt_file, decrypt_file
 
 __all__ = ['main']
 
@@ -23,14 +23,14 @@ def main():
         parser.error('Invalid use: use decrypt or encrypt')
     elif options.command == 'decrypt':
         try:
-            decrypt(options.path)
+            decrypt_file(options.path)
         except InvalidToken:
             exit('Invalid key')
         except ValueError as err:
             exit('Error: ' + err.args[0])
     elif options.command == 'encrypt':
         try:
-            encrypt(options.path)
+            encrypt_file(options.path)
         except InvalidToken:
             exit('Invalid key')
         except ValueError as err:

@@ -6,28 +6,6 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
-__all__ = ['encrypt', 'decrypt', 'password_to_aes_key', 'get_fernet', 'ensure_filepath']
-
-
-def encrypt(filepath: str, password: str = None):
-    path = ensure_filepath(filepath)
-    fernet = get_fernet(password=password, ensure=True)
-
-    decrypted = path.read_bytes()
-    encrypted = fernet.encrypt(decrypted)
-
-    path.write_bytes(encrypted)
-
-
-def decrypt(filepath: str, password: str = None):
-    path = ensure_filepath(filepath)
-    fernet = get_fernet(password=password)
-
-    encrypted = path.read_bytes()
-    decrypted = fernet.decrypt(encrypted)
-
-    path.write_bytes(decrypted)
-
 
 def password_to_aes_key(password: str):
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
