@@ -9,9 +9,9 @@ from cryptography.hazmat.primitives import hashes
 __all__ = ['encrypt', 'decrypt', 'password_to_aes_key', 'get_fernet', 'ensure_filepath']
 
 
-def encrypt(filepath: str):
+def encrypt(filepath: str, password: str = None):
     path = ensure_filepath(filepath)
-    fernet = get_fernet(ensure=True)
+    fernet = get_fernet(password=password, ensure=True)
 
     decrypted = path.read_bytes()
     encrypted = fernet.encrypt(decrypted)
@@ -19,9 +19,9 @@ def encrypt(filepath: str):
     path.write_bytes(encrypted)
 
 
-def decrypt(filepath: str):
+def decrypt(filepath: str, password: str = None):
     path = ensure_filepath(filepath)
-    fernet = get_fernet()
+    fernet = get_fernet(password=password)
 
     encrypted = path.read_bytes()
     decrypted = fernet.decrypt(encrypted)
@@ -35,7 +35,7 @@ def password_to_aes_key(password: str):
     return base64.urlsafe_b64encode(digest.finalize())
 
 
-def get_fernet(password=None, ensure=False):
+def get_fernet(password: str = None, ensure: bool = False):
     if not password:
         password = getpass('AES password: ')
         if ensure:
