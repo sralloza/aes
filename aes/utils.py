@@ -6,6 +6,8 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
+__all__ = ['password_to_aes_key', 'get_fernet', 'ensure_filepath']
+
 
 def password_to_aes_key(password: str):
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
