@@ -1,12 +1,16 @@
 import base64
 from getpass import getpass
+from glob import glob
 from pathlib import Path
+from typing import Union
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
 __all__ = ['password_to_aes_key', 'get_fernet', 'ensure_filepath']
+
+path_or_str = Union[Path, str]
 
 
 def password_to_aes_key(password: str):
@@ -35,25 +39,25 @@ def ensure_filepath(filepath: str):
     return path
 
 
-def _ensure_filepath(filepath: str):
+def _ensure_filepath(filepath: path_or_str):
     path = Path(filepath).absolute()
     if not path.exists():
-        possible = list(path.parent.glob(filepath))
+        possible = glob(path.as_posix())
 
         if len(possible) == 1:
-            return possible[0]
-        possible = list(path.parent.glob(filepath + '*'))
+            return Path(possible[0])
+        possible = glob(path.with_name(path.name + '*').as_posix())
 
         if len(possible) == 1:
-            return possible[0]
-        possible = list(path.parent.glob('*' + filepath))
+            return Path(possible[0])
+        possible = glob(path.with_name('*' + path.name).as_posix())
 
         if len(possible) == 1:
-            return possible[0]
-        possible = list(path.parent.glob('*' + filepath + '*'))
+            return Path(possible[0])
+        possible = glob(path.with_name('*' + path.name + '*').as_posix())
 
         if len(possible) == 1:
-            return possible[0]
+            return Path(possible[0])
 
         raise ValueError('Invalid filepath: %s' % filepath)
     return path
