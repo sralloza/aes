@@ -26,7 +26,7 @@ class TestGetFernet:
 
     @pytest.fixture
     def mocks(self):
-        getpass_mock = mock.patch('aes.utils.getpass', return_value='typed-password').start()
+        getpass_mock = mock.patch('aes.utils.getpass').start()
         ptk_mock = mock.patch('aes.utils.password_to_aes_key', return_value=KEY).start()
 
         yield getpass_mock, ptk_mock
@@ -41,8 +41,22 @@ class TestGetFernet:
     def ensure(self, request):
         return request.param
 
-    def test_get_fernet(self, mocks, password, ensure):
+    @pytest.fixture(params=[True, False])
+    def password_correct(self, request):
+        return request.param
+
+    def test_get_fernet(self, mocks, password, ensure, password_correct):
         getpass_mock, ptk_mock = mocks
+
+        if password_correct:
+            getpass_mock.return_value = 'typed-password'
+        else:
+            getpass_mock.side_effect = ['typed-password', 'wrong-password']
+
+        if not password_correct and ensure and not password:
+            with pytest.raises(ValueError, match='Error: passwords do not match'):
+                get_fernet(password=password, ensure=ensure)
+            return
 
         fernet = get_fernet(password=password, ensure=ensure)
 
