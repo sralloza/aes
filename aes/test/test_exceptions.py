@@ -1,6 +1,6 @@
 import pytest
 
-from aes import BaseAESError, IncorrectPasswordError
+from aes.exceptions import BaseAESError, IncorrectPasswordError
 
 
 def test_base_aes_error():

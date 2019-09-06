@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from aes import encrypt_file, decrypt_file
+from aes.files import encrypt_file, decrypt_file
 
 
 @pytest.fixture(params=['file.txt', 'foo/file.txt', 'folder/doc.pdf'])

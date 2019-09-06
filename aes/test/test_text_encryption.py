@@ -2,8 +2,7 @@ from unittest import mock
 
 import pytest
 
-from aes import encrypt_text, decrypt_text
-
+from aes.text import encrypt_text, decrypt_text
 
 
 class TestTextEncrypt:

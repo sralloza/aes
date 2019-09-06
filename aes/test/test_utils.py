@@ -5,8 +5,7 @@ from unittest import mock
 import pytest
 from cryptography.fernet import Fernet
 
-from aes import get_fernet, password_to_aes_key, ensure_filepath
-from aes.utils import _ensure_filepath
+from aes.utils import _ensure_filepath, password_to_aes_key, get_fernet, ensure_filepath
 
 passwords = ['hi', 'hello', 'penthagon', 'a-fdiwkvnxoeokd', '12345/!"$%&/()=?¿*^¨:_;<>\\']
 
