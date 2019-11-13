@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 
 from cryptography.fernet import InvalidToken
 
-from aes import version
-from .files import encrypt_file, decrypt_file
+from . import get_version
+from .files import decrypt_file, encrypt_file
 
 __all__ = ["main", "parse_args"]
 
@@ -23,7 +23,8 @@ def parse_args():
 
     if options.command is None:
         if options.v:
-            exit("Version: %r" % version)
+            # TODO: it should be one call to get_version.
+            exit("Version: %r" % get_version())
 
         return parser.error("Invalid use: use decrypt or encrypt")
 
@@ -34,7 +35,7 @@ def main():
     options = parse_args()
 
     if options.v:
-        exit("Version: %r" % version)
+        exit("Version: %r" % get_version())
 
     elif options.command == "decrypt":
         try:
