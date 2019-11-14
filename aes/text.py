@@ -7,7 +7,7 @@ from aes.utils import get_fernet
 
 str_or_bytes = Union[str, bytes]
 
-__all__ = ['encrypt_text', 'decrypt_text']
+__all__ = ["encrypt_text", "decrypt_text"]
 
 
 def encrypt_text(text: str_or_bytes, password: str = None):

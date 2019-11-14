@@ -1,4 +1,4 @@
-__all__ = ['BaseAESError', 'IncorrectPasswordError']
+__all__ = ["BaseAESError", "IncorrectPasswordError"]
 
 
 class BaseAESError(Exception):

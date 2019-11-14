@@ -10,7 +10,9 @@ __all__ = ["main", "parse_args"]
 
 def parse_args(*args):
     parser = ArgumentParser("AES")
-    parser.add_argument("--v", "-version", action="store_true", help="Show version", dest="version")
+    parser.add_argument(
+        "--v", "-version", action="store_true", help="Show version", dest="version"
+    )
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
     encrypt_parser = subparsers.add_parser("encrypt")
@@ -40,7 +42,7 @@ def main(*args):
         except InvalidToken:
             exit("Invalid password")
         except ValueError as err:
-            arg = err.args[0] if err.args else ''
+            arg = err.args[0] if err.args else ""
             exit("Error: " + arg)
     elif options.command == "encrypt":
         try:
@@ -48,5 +50,5 @@ def main(*args):
         except InvalidToken:
             exit("Invalid password")
         except ValueError as err:
-            arg = err.args[0] if err.args else ''
+            arg = err.args[0] if err.args else ""
             exit("Error: " + arg)

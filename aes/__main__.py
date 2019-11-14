@@ -1,6 +1,6 @@
-from .main import main
+from .cli import main
 
 __all__ = []
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
