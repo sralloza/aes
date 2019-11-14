@@ -8,9 +8,11 @@ from .files import decrypt_file, encrypt_file
 __all__ = ["main", "parse_args"]
 
 
-def parse_args():
+def parse_args(*args):
     parser = ArgumentParser("AES")
-    parser.add_argument("--v", "-version", action="store_true", help="Show version")
+    parser.add_argument(
+        "--v", "-version", action="store_true", help="Show version", dest="version"
+    )
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
     encrypt_parser = subparsers.add_parser("encrypt")
@@ -19,37 +21,34 @@ def parse_args():
     decrypt_parser = subparsers.add_parser("decrypt")
     decrypt_parser.add_argument("path", type=str)
 
-    options = parser.parse_args()
+    options = parser.parse_args(args)
 
     if options.command is None:
-        if options.v:
-            # TODO: it should be one call to get_version.
-            exit("Version: %r" % get_version())
-
-        return parser.error("Invalid use: use decrypt or encrypt")
+        if not options.version:
+            return parser.error("Invalid use: use decrypt or encrypt")
 
     return options
 
 
-def main():
-    options = parse_args()
+def main(*args):
+    options = parse_args(*args)
 
-    if options.v:
+    if options.version:
         exit("Version: %r" % get_version())
 
     elif options.command == "decrypt":
         try:
             decrypt_file(options.path)
         except InvalidToken:
-            exit("Invalid key")
+            exit("Invalid password")
         except ValueError as err:
-            exit("Error: " + err.args[0])
+            arg = err.args[0] if err.args else ""
+            exit("Error: " + arg)
     elif options.command == "encrypt":
         try:
             encrypt_file(options.path)
         except InvalidToken:
-            exit("Invalid key")
+            exit("Invalid password")
         except ValueError as err:
-            exit("Error: " + err.args[0])
-    else:
-        raise ValueError("Invalid command: %r" % options.command)
+            arg = err.args[0] if err.args else ""
+            exit("Error: " + arg)

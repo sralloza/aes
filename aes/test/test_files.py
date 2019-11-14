@@ -1,29 +1,34 @@
 from unittest import mock
 
 import pytest
+from cryptography.fernet import InvalidToken
 
-from aes.files import encrypt_file, decrypt_file
+from aes import IncorrectPasswordError
+from aes.files import decrypt_file, encrypt_file
 
 
-@pytest.fixture(params=['file.txt', 'foo/file.txt', 'folder/doc.pdf'])
+@pytest.fixture(params=["file.txt", "foo/file.txt", "folder/doc.pdf"])
 def filepath(request):
     return request.param
 
 
-@pytest.fixture(params=[None, 'new-password'])
+@pytest.fixture(params=[None, "new-password"])
 def password(request):
     return request.param
 
 
-@pytest.fixture(params=[b'message-encrypted-1', b'message-encrypted-2', b'message-encrypted-3'])
+@pytest.fixture(
+    params=[b"message-encrypted-1", b"message-encrypted-2", b"message-encrypted-3"]
+)
 def text(request):
     return request.param
+
 
 class TestFileEncrypt:
     @pytest.fixture
     def mocks(self):
-        ensure_filepath_mock = mock.patch('aes.files.ensure_filepath').start()
-        encrypt_text_mock = mock.patch('aes.files.encrypt_text').start()
+        ensure_filepath_mock = mock.patch("aes.files.ensure_filepath").start()
+        encrypt_text_mock = mock.patch("aes.files.encrypt_text").start()
 
         yield ensure_filepath_mock, encrypt_text_mock
 
@@ -43,13 +48,12 @@ class TestFileEncrypt:
 class TestFileDecrypt:
     @pytest.fixture
     def mocks(self):
-        ensure_filepath_mock = mock.patch('aes.files.ensure_filepath').start()
-        decrypt_text_mock = mock.patch('aes.files.decrypt_text').start()
+        ensure_filepath_mock = mock.patch("aes.files.ensure_filepath").start()
+        decrypt_text_mock = mock.patch("aes.files.decrypt_text").start()
 
         yield ensure_filepath_mock, decrypt_text_mock
 
         mock.patch.stopall()
-
 
     def test_decrypt(self, filepath, password, text, mocks):
         ensure_filepath_mock, decrypt_text_mock = mocks

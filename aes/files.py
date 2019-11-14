@@ -1,7 +1,7 @@
 from aes.text import encrypt_text, decrypt_text
 from aes.utils import ensure_filepath
 
-__all__ = ['encrypt_file', 'decrypt_file']
+__all__ = ["encrypt_file", "decrypt_file"]
 
 
 def encrypt_file(filepath: str, password: str = None):

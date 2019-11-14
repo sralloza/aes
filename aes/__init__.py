@@ -19,10 +19,10 @@ __all__ = [
 
 
 def get_version():
-    return Path(__file__).with_name("VERSION").read_text()
+    return Path(__file__).with_name("VERSION").read_text().strip()
 
 
-def main():
-    from .main import main as _main
+def main(*args):
+    from .cli import main as _main
 
-    return _main()
+    return _main(*args)
