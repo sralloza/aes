@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from cryptography.fernet import InvalidToken
 
 from aes import IncorrectPasswordError, decrypt_text, encrypt_text
 
@@ -68,6 +69,7 @@ class TestTextDecrypt:
 
     @mock.patch("aes.text.get_fernet")
     def test_text_encrypt_error(self, get_fernet_mock, text, password):
+        get_fernet_mock.return_value.decrypt.side_effect = InvalidToken
         with pytest.raises(IncorrectPasswordError):
             decrypt_text(text=text, password=password)
 
