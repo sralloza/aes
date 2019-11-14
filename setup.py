@@ -6,7 +6,7 @@ from setuptools.command.test import test as TestCommand
 
 
 def get_version():
-    return Path(__file__).with_name("aes").joinpath("VERSION").read_text()
+    return Path(__file__).with_name("aes").joinpath("VERSION").read_text().strip()
 
 
 version = get_version()

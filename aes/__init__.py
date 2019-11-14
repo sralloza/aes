@@ -19,7 +19,7 @@ __all__ = [
 
 
 def get_version():
-    return Path(__file__).with_name("VERSION").read_text()
+    return Path(__file__).with_name("VERSION").read_text().strip()
 
 
 def main(*args):
