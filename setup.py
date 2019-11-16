@@ -9,6 +9,11 @@ def get_version():
     return Path(__file__).with_name("aes").joinpath("VERSION").read_text().strip()
 
 
+def get_requirements():
+    reqs = Path(__file__).with_name("requirements.txt")
+    return [x.strip() for x in reqs.read_text().split("\n") if x.strip()]
+
+
 version = get_version()
 
 
@@ -42,9 +47,9 @@ setup(
     include_package_data=True,
     author_email="admin@sralloza.es",
     packages=["aes", "aes.test"],
-    install_requires=["cryptography"],
+    install_requires=get_requirements(),
     package_data={"aes.test": ["test_data/ensure_filepath/*"]},
-    tests_require=["pytest"],
+    tests_require=["pytest", "pytest-cov"],
     cmdclass={"test": PyTest},
     zip_safe=False,
 )
