@@ -1,6 +1,6 @@
 from unittest import mock
 from aes import main, get_version
-
+from pathlib import Path
 
 @mock.patch("aes.cli.main")
 def test_main(main_mock):
@@ -9,6 +9,5 @@ def test_main(main_mock):
 
 
 def test_get_version():
-    current_dir = __file__[: __file__.rindex("\\")]
-    with open(current_dir + "//../../aes/VERSION", "rt") as file:
-        assert get_version() == file.read().strip()
+    version_path = Path(__file__).parent.parent.parent.joinpath("aes/VERSION")
+    assert version_path.read_text().strip() == get_version()
