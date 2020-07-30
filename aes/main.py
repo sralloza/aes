@@ -8,41 +8,49 @@ from .files import decrypt_file, encrypt_file
 __all__ = ["main", "parse_args"]
 
 
-def parse_args():
-    parser = ArgumentParser("AES")
-    parser.add_argument(
-        "--v", "-version", action="store_true", help="Show version", dest="version"
-    )
-    subparsers = parser.add_subparsers(title="commands", dest="command")
+class Parser:
+    parser = ArgumentParser("")
 
-    encrypt_parser = subparsers.add_parser("encrypt")
-    encrypt_parser.add_argument("path", type=str)
+    @classmethod
+    def error(cls, msg):
+        cls.parser.error(msg)
 
-    decrypt_parser = subparsers.add_parser("decrypt")
-    decrypt_parser.add_argument("path", type=str)
+    @classmethod
+    def parse_args(cls):
+        parser = ArgumentParser("AES")
+        parser.add_argument(
+            "--v", "-version", action="store_true", help="Show version", dest="version"
+        )
+        subparsers = parser.add_subparsers(title="commands", dest="command")
 
-    options = parser.parse_args()
+        encrypt_parser = subparsers.add_parser("encrypt")
+        encrypt_parser.add_argument("path", type=str)
 
-    return options
+        decrypt_parser = subparsers.add_parser("decrypt")
+        decrypt_parser.add_argument("path", type=str)
+
+        options = parser.parse_args()
+
+        return vars(options)
 
 
 def main():
-    options = parse_args()
+    options = Parser.parse_args()
 
-    if options.version:
+    if options["version"]:
         exit("Version: %r" % __version__)
 
-    elif options.command == "decrypt":
+    elif options["command"] == "decrypt":
         try:
-            decrypt_file(options.path)
+            decrypt_file(options["path"])
         except InvalidToken:
             exit("Invalid password")
         except ValueError as err:
             arg = err.args[0] if err.args else ""
             exit("Error: " + arg)
-    elif options.command == "encrypt":
+    elif options["command"] == "encrypt":
         try:
-            encrypt_file(options.path)
+            encrypt_file(options["path"])
         except InvalidToken:
             exit("Invalid password")
         except ValueError as err:

@@ -1,9 +1,7 @@
 from unittest import mock
 
 import pytest
-from cryptography.fernet import InvalidToken
 
-from aes import IncorrectPasswordError
 from aes.files import decrypt_file, encrypt_file
 
 
