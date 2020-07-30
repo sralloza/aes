@@ -8,7 +8,7 @@ from .files import decrypt_file, encrypt_file
 __all__ = ["main", "parse_args"]
 
 
-def parse_args(*args):
+def parse_args():
     parser = ArgumentParser("AES")
     parser.add_argument(
         "--v", "-version", action="store_true", help="Show version", dest="version"
@@ -21,17 +21,17 @@ def parse_args(*args):
     decrypt_parser = subparsers.add_parser("decrypt")
     decrypt_parser.add_argument("path", type=str)
 
-    options = parser.parse_args(args)
+    options = parser.parse_args()
 
-    if options.command is None:
-        if not options.version:
-            return parser.error("Invalid use: use decrypt or encrypt")
+    # if options.command is None:
+    #     if not options.version:
+    #         return parser.error("Invalid use: use decrypt or encrypt")
 
     return options
 
 
-def main(*args):
-    options = parse_args(*args)
+def main():
+    options = parse_args()
 
     if options.version:
         exit("Version: %r" % get_version())

@@ -1,10 +1,9 @@
 from unittest import mock
 
-import pytest
 from cryptography.fernet import InvalidToken
+import pytest
 
-from aes import main
-from aes.cli import parse_args
+from aes.main import main, parse_args
 
 
 class TestParseArgs:
@@ -66,12 +65,12 @@ class TestMain:
         with pytest.raises(SystemExit, match="Version:"):
             main("--v")
 
-    @mock.patch("aes.cli.encrypt_file")
+    @mock.patch("aes.main.encrypt_file")
     def test_encrypt_file_good(self, encrypt_mock):
         main("encrypt", "filepath")
         encrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.cli.encrypt_file")
+    @mock.patch("aes.main.encrypt_file")
     def test_encrypt_file_encryption_error(self, encrypt_mock):
         encrypt_mock.side_effect = InvalidToken
 
@@ -79,7 +78,7 @@ class TestMain:
             main("encrypt", "filepath")
         encrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.cli.encrypt_file")
+    @mock.patch("aes.main.encrypt_file")
     def test_encrypt_file_value_error(self, encrypt_mock):
         encrypt_mock.side_effect = ValueError
 
@@ -87,12 +86,12 @@ class TestMain:
             main("encrypt", "filepath")
         encrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.cli.decrypt_file")
+    @mock.patch("aes.main.decrypt_file")
     def test_decrypt_file_good(self, decrypt_mock):
         main("decrypt", "filepath")
         decrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.cli.decrypt_file")
+    @mock.patch("aes.main.decrypt_file")
     def test_decrypt_file_decryption_error(self, decrypt_mock):
         decrypt_mock.side_effect = InvalidToken
 
@@ -100,7 +99,7 @@ class TestMain:
             main("decrypt", "filepath")
         decrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.cli.decrypt_file")
+    @mock.patch("aes.main.decrypt_file")
     def test_decrypt_file_value_error(self, decrypt_mock):
         decrypt_mock.side_effect = ValueError
 
