@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from setuptools import setup
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 
@@ -39,17 +39,15 @@ class PyTest(TestCommand):
 
 setup(
     name="aes",
-    url="https://git.sralloza.es/git/aes.git",
+    url="https://github.com/sralloza/aes",
     description="AES 128-bit encryption for python",
     version=version,
-    author="SrAlloza",
+    author="Diego Alloza González",
     entry_points={"console_scripts": ["aes=aes.main:main"],},
     include_package_data=True,
-    author_email="admin@sralloza.es",
-    packages=["aes", "aes.test"],
+    author_email="aes-support@sralloza.es",
+    packages=find_packages(),
     install_requires=get_requirements(),
-    package_data={"aes.test": ["test_data/ensure_filepath/*"]},
-    tests_require=["pytest", "pytest-cov"],
-    cmdclass={"test": PyTest},
+    tests_require=["pytest", "coverage"],
     zip_safe=False,
 )
