@@ -4,6 +4,8 @@ import pytest
 
 from aes.files import decrypt_file, encrypt_file
 
+# pylint: disable=redefined-outer-name
+
 
 @pytest.fixture(params=["file.txt", "foo/file.txt", "folder/doc.pdf"])
 def filepath(request):
