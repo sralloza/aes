@@ -1,19 +1,24 @@
-import argparse
-from argparse import Namespace
-from os.path import realpath
 import shlex
 from unittest import mock
 
-import pytest
 from cryptography.fernet import InvalidToken
+import pytest
 
-from aes.main import main, Parser
+from aes import __version__
+from aes.main import Parser, main
+
+
+def test_parser_error(capsys):
+    with pytest.raises(SystemExit, match="2"):
+        Parser.error("hi")
+    captured = capsys.readouterr()
+    assert ": error: hi" in captured.err
+    assert captured.out == ""
 
 
 class TestParseArgs:
     @mock.patch("sys.argv")
     def set_args(self, string="", sys_argv_m=None):
-        # breakpoint()
         real_args = ["test.py"] + shlex.split(string)
         sys_argv_m.__getitem__.side_effect = lambda s: real_args[s]
         try:
@@ -86,6 +91,15 @@ class TestMain:
         real_kwargs.update(kwargs)
         self.parse_args_m.return_value = real_kwargs
 
+    def test_version(self, capsys):
+        self.set_args(version=True)
+        with pytest.raises(SystemExit, match="0"):
+            main()
+        captured = capsys.readouterr()
+        expected = "Version: " + repr(__version__) + "\n"
+        assert captured.out == expected
+        assert captured.err == ""
+
     @mock.patch("aes.main.encrypt_file")
     def test_encrypt_file_good(self, encrypt_mock):
         self.set_args(command="encrypt", path="filepath")
@@ -93,21 +107,30 @@ class TestMain:
         encrypt_mock.assert_called_once_with("filepath")
 
     @mock.patch("aes.main.encrypt_file")
-    def test_encrypt_file_encryption_error(self, encrypt_mock):
+    def test_encrypt_file_encryption_error(self, encrypt_mock, capsys):
         encrypt_mock.side_effect = InvalidToken
 
-        with pytest.raises(SystemExit, match="Invalid password"):
+        with pytest.raises(SystemExit, match="1"):
             self.set_args(command="encrypt", path="filepath")
             main()
+
+        captured = capsys.readouterr()
+        assert "Invalid password" in captured.err
+        assert captured.out == ""
+
         encrypt_mock.assert_called_once_with("filepath")
 
     @mock.patch("aes.main.encrypt_file")
-    def test_encrypt_file_value_error(self, encrypt_mock):
+    def test_encrypt_file_value_error(self, encrypt_mock, capsys):
         encrypt_mock.side_effect = ValueError
 
-        with pytest.raises(SystemExit, match="Error:"):
+        with pytest.raises(SystemExit, match="1"):
             self.set_args(command="encrypt", path="filepath")
             main()
+
+        captured = capsys.readouterr()
+        assert "Error:" in captured.err
+        assert captured.out == ""
         encrypt_mock.assert_called_once_with("filepath")
 
     @mock.patch("aes.main.decrypt_file")
@@ -117,19 +140,32 @@ class TestMain:
         decrypt_mock.assert_called_once_with("filepath")
 
     @mock.patch("aes.main.decrypt_file")
-    def test_decrypt_file_decryption_error(self, decrypt_mock):
+    def test_decrypt_file_decryption_error(self, decrypt_mock, capsys):
         decrypt_mock.side_effect = InvalidToken
 
-        with pytest.raises(SystemExit, match="Invalid password"):
+        with pytest.raises(SystemExit, match="1"):
             self.set_args(command="decrypt", path="filepath")
             main()
+
+        captured = capsys.readouterr()
+        assert "Invalid password" in captured.err
+        assert captured.out == ""
         decrypt_mock.assert_called_once_with("filepath")
 
     @mock.patch("aes.main.decrypt_file")
-    def test_decrypt_file_value_error(self, decrypt_mock):
+    def test_decrypt_file_value_error(self, decrypt_mock, capsys):
         decrypt_mock.side_effect = ValueError
 
-        with pytest.raises(SystemExit, match="Error:"):
+        with pytest.raises(SystemExit, match="1"):
             self.set_args(command="decrypt", path="filepath")
             main()
+
+        captured = capsys.readouterr()
+        assert "Error:" in captured.err
+        assert captured.out == ""
         decrypt_mock.assert_called_once_with("filepath")
+
+    def test_invalid_command(self):
+        with pytest.raises(ValueError, match="is not a valid command"):
+            self.set_args(command="invalid")
+            main()
