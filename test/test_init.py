@@ -1,19 +1,7 @@
-from pathlib import Path
-from unittest import mock
-
-import pytest
-
-from aes import main
+from aes import __version__
+from aes._version import get_versions
 
 
-@pytest.mark.skip
-@mock.patch("aes.main.main")
-def test_main(main_mock):
-    main(5, True)
-    main_mock.assert_called_once_with(5, True)
-
-
-@pytest.mark.skip
-def test_get_version():
-    version_path = Path(__file__).parent.parent.parent.joinpath("aes/VERSION")
-    assert version_path.read_text().strip() == get_version()
+def test_get_versions():
+    real_version = get_versions()["version"]
+    assert real_version == __version__
