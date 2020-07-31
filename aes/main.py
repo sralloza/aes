@@ -1,28 +1,44 @@
+"""Module to manage the command line execution."""
+
 from argparse import ArgumentParser
 import sys
+from typing import NoReturn
 
 from cryptography.fernet import InvalidToken
 
 from . import __version__
 from .files import decrypt_file, encrypt_file
 
-__all__ = ["main", "parse_args"]
-
 
 class Parser:
+    """Represents the argument parser."""
+
     parser = ArgumentParser("test")
 
     @classmethod
-    def error(cls, msg):
+    def error(cls, msg: str) -> NoReturn:
+        """Prints the error message to the stderr with the program
+        ussage and then exits.
+
+        Args:
+            msg (str): error message.
+        """
+
         cls.parser.error(msg)
 
     @classmethod
-    def parse_args(cls):
-        parser = ArgumentParser("AES")
-        parser.add_argument(
+    def parse_args(cls) -> dict:
+        """Parses command line arguments.
+
+        Returns:
+            dict: arguments parsed.
+        """
+
+        cls.parser = ArgumentParser("AES")
+        cls.parser.add_argument(
             "--v", "-version", action="store_true", help="Show version", dest="version"
         )
-        subparsers = parser.add_subparsers(title="commands", dest="command")
+        subparsers = cls.parser.add_subparsers(title="commands", dest="command")
 
         encrypt_parser = subparsers.add_parser("encrypt")
         encrypt_parser.add_argument("path", type=str)
@@ -30,12 +46,18 @@ class Parser:
         decrypt_parser = subparsers.add_parser("decrypt")
         decrypt_parser.add_argument("path", type=str)
 
-        options = parser.parse_args()
+        options = cls.parser.parse_args()
 
         return vars(options)
 
 
 def main():
+    """Main function.
+
+    Raises:
+        ValueError: if `Parser.parse_args` returns an invalid command.
+    """
+
     options = Parser.parse_args()
 
     if options["version"]:

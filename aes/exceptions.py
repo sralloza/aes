@@ -1,4 +1,4 @@
-__all__ = ["BaseAESError", "IncorrectPasswordError"]
+"""Exceptions used in this module."""
 
 
 class BaseAESError(Exception):
