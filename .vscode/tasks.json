@@ -6,7 +6,7 @@
     {
       "label": "Git Clean",
       "type": "shell",
-      "command": "git clean -fdx -e venv -e .idea -e TODO.MD -e .vscode -e *.spec",
+      "command": "git clean -fdx -e venv",
       "problemMatcher": []
     },
     {
