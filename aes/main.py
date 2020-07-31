@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import sys
 
 from cryptography.fernet import InvalidToken
 
@@ -9,7 +10,7 @@ __all__ = ["main", "parse_args"]
 
 
 class Parser:
-    parser = ArgumentParser("")
+    parser = ArgumentParser("test")
 
     @classmethod
     def error(cls, msg):
@@ -38,21 +39,29 @@ def main():
     options = Parser.parse_args()
 
     if options["version"]:
-        exit("Version: %r" % __version__)
+        print("Version: %r" % __version__)
+        sys.exit(0)
 
     elif options["command"] == "decrypt":
         try:
             decrypt_file(options["path"])
         except InvalidToken:
-            exit("Invalid password")
+            print("Invalid password", file=sys.stderr)
+            sys.exit(1)
         except ValueError as err:
             arg = err.args[0] if err.args else ""
-            exit("Error: " + arg)
+            print("Error: " + arg, file=sys.stderr)
+            sys.exit(1)
     elif options["command"] == "encrypt":
         try:
             encrypt_file(options["path"])
         except InvalidToken:
-            exit("Invalid password")
+            print("Invalid password", file=sys.stderr)
+            sys.exit(1)
         except ValueError as err:
             arg = err.args[0] if err.args else ""
-            exit("Error: " + arg)
+            print("Error: " + arg, file=sys.stderr)
+            sys.exit(1)
+    else:
+        msg = f"{options['command']!r} is not a valid command"
+        raise ValueError(msg)
