@@ -1,28 +1,6 @@
-from .exceptions import BaseAESError, IncorrectPasswordError
-from .files import decrypt_file, encrypt_file
-from .text import decrypt_text, encrypt_text
-from .utils import ensure_filepath, get_fernet, password_to_aes_key
-from pathlib import Path
+"""Simple AES interface via command line."""
 
-__all__ = [
-    "BaseAESError",
-    "IncorrectPasswordError",
-    "decrypt_file",
-    "encrypt_file",
-    "main",
-    "decrypt_text",
-    "encrypt_text",
-    "ensure_filepath",
-    "get_fernet",
-    "password_to_aes_key",
-]
+from ._version import get_versions
 
-
-def get_version():
-    return Path(__file__).with_name("VERSION").read_text().strip()
-
-
-def main(*args):
-    from .cli import main as _main
-
-    return _main(*args)
+__version__ = get_versions()["version"]
+del get_versions

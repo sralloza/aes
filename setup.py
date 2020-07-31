@@ -1,55 +1,27 @@
-import sys
 from pathlib import Path
 
-from setuptools import setup
-from setuptools.command.test import test as TestCommand
+from setuptools import find_packages, setup
 
-
-def get_version():
-    return Path(__file__).with_name("aes").joinpath("VERSION").read_text().strip()
+from versioneer import get_cmdclass, get_version
 
 
 def get_requirements():
     reqs = Path(__file__).with_name("requirements.txt")
-    return [x.strip() for x in reqs.read_text().split("\n") if x.strip()]
-
-
-version = get_version()
-
-
-class PyTest(TestCommand):
-    user_options = [("pytest-args=", "a", "Arguments to pass to py.test")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
+    return [x.strip() for x in reqs.read_text().splitlines() if x.strip()]
 
 
 setup(
     name="aes",
-    url="https://git.sralloza.es/git/aes.git",
+    url="https://github.com/sralloza/aes",
     description="AES 128-bit encryption for python",
-    version=version,
-    author="SrAlloza",
+    version=get_version(),
+    author="Diego Alloza González",
     entry_points={"console_scripts": ["aes=aes.main:main"],},
     include_package_data=True,
-    author_email="admin@sralloza.es",
-    packages=["aes", "aes.test"],
+    author_email="aes-support@sralloza.es",
+    packages=find_packages(),
     install_requires=get_requirements(),
-    package_data={"aes.test": ["test_data/ensure_filepath/*"]},
-    tests_require=["pytest", "pytest-cov"],
-    cmdclass={"test": PyTest},
+    tests_require=["pytest", "coverage"],
+    cmdclass=get_cmdclass(),
     zip_safe=False,
 )

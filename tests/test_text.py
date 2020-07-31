@@ -1,9 +1,10 @@
 from unittest import mock
 
-import pytest
 from cryptography.fernet import InvalidToken
+import pytest
 
-from aes import IncorrectPasswordError, decrypt_text, encrypt_text
+from aes.exceptions import IncorrectPasswordError
+from aes.text import decrypt_text, encrypt_text
 
 
 class TestTextEncrypt:

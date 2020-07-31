@@ -1,10 +1,10 @@
 from unittest import mock
 
 import pytest
-from cryptography.fernet import InvalidToken
 
-from aes import IncorrectPasswordError
 from aes.files import decrypt_file, encrypt_file
+
+# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture(params=["file.txt", "foo/file.txt", "folder/doc.pdf"])

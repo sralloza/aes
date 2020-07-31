@@ -7,7 +7,9 @@ from cryptography.fernet import Fernet
 
 from aes.utils import _ensure_filepath, password_to_aes_key, get_fernet, ensure_filepath
 
-passwords = [
+# pylint: disable=redefined-outer-name,protected-access
+
+PASSWORDS = [
     "hi",
     "hello",
     "penthagon",
@@ -19,7 +21,7 @@ KEY = b"KKSuP8aAubHTLcnHxY8dgTHYOTeqSll6Bqs_wdXwlFA="
 ROOT = Path(__file__).parent.parent.parent
 
 
-@pytest.mark.parametrize("password", passwords)
+@pytest.mark.parametrize("password", PASSWORDS)
 def test_password_to_aes_key(password):
     aes_key = password_to_aes_key(password)
     assert len(aes_key) == len(Fernet.generate_key())

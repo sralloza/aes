@@ -1,0 +1,2 @@
+include versioneer.py
+include aes/_version.py

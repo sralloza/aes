@@ -1,0 +1,18 @@
+[run]
+branch = True
+
+source = aes, ./
+
+omit =
+    aes/_version.py
+    aes/__main__.py
+    .venv/*
+    venv/*
+    setup.py
+    versioneer.py
+    launcher.py
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+    if __name__ == "__main__":
