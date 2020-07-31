@@ -1,0 +1,56 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Git Clean",
+      "type": "shell",
+      "command": "git clean -fdx -e venv -e .idea -e TODO.MD -e .vscode -e *.spec",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run coverage",
+      "type": "shell",
+      "command": "${config:python.pythonPath} -m coverage run -m pytest -vv -l & ${config:python.pythonPath} -m coverage html & chrome.exe ${workspaceFolder}\\htmlcov\\index.html",
+      "problemMatcher": [],
+      "dependsOn": ["Git Clean"]
+    },
+    {
+      "label": "Check code",
+      "type": "shell",
+      "problemMatcher": [],
+      "dependsOn": [
+        "black module",
+        "black tests",
+        "pylint module",
+        "pylint tests"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "pylint module",
+      "type": "shell",
+      "command": "${config:python.pythonPath} -m pylint aes -d C0330,W0622,R0913,R0903",
+      "problemMatcher": []
+    },
+    {
+      "label": "pylint tests",
+      "type": "shell",
+      "command": "${config:python.pythonPath} -m pylint tests -d C0111,C0330,C0114,C0115,C0116,R0201,R0915,W0201,R0914,R0912,C0415",
+      "problemMatcher": []
+    },
+    {
+      "label": "black module",
+      "type": "shell",
+      "command": "${config:python.pythonPath} -m black aes",
+      "problemMatcher": []
+    },
+    {
+      "label": "black tests",
+      "type": "shell",
+      "command": "${config:python.pythonPath} -m black tests",
+      "problemMatcher": []
+    }
+  ]
+}
