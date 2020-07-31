@@ -1,4 +1,5 @@
 import shlex
+import sys
 from unittest import mock
 
 from cryptography.fernet import InvalidToken
@@ -14,6 +15,20 @@ def test_parser_error(capsys):
     captured = capsys.readouterr()
     assert ": error: hi" in captured.err
     assert captured.out == ""
+
+
+@mock.patch("sys.argv")
+def test_parser_rewrite(sys_argv_m):
+    real_args = ["test.py", "-h"]
+    sys_argv_m.__getitem__.side_effect = lambda s: real_args[s]
+
+    del sys.modules["aes.main"]
+    assert Parser.parser.prog == "test"
+
+    with pytest.raises(SystemExit):
+        Parser.parse_args()
+
+    assert Parser.parser.prog == "AES"
 
 
 class TestParseArgs:
