@@ -32,7 +32,6 @@ class TestEncryptFolder:
             self.encr_file_m.assert_any_call(file, None)
 
 
-
 class TestDecryptFolder:
     @pytest.fixture(autouse=True)
     def mocks(self):

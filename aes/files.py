@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Union
 
-from aes.text import decrypt_text, encrypt_text
+from .text import decrypt_text, encrypt_text
 
 _FileLike = Union[str, Path]
 

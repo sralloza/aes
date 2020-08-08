@@ -27,7 +27,7 @@ def text(request):
 class TestFileEncrypt:
     @pytest.fixture(autouse=True)
     def mocks(self):
-        self.enctext_m =  mock.patch("aes.files.encrypt_text").start()
+        self.enctext_m = mock.patch("aes.files.encrypt_text").start()
         self.path_m = mock.patch("aes.files.Path").start()
 
         yield

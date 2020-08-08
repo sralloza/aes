@@ -4,7 +4,7 @@ from os import walk
 from pathlib import Path
 from typing import Union
 
-from aes.files import decrypt_file, encrypt_file
+from .files import decrypt_file, encrypt_file
 
 _FileLike = Union[str, Path]
 
