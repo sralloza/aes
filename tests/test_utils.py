@@ -1,4 +1,5 @@
 import base64
+import functools
 from pathlib import Path
 from unittest import mock
 
@@ -62,6 +63,7 @@ class TestGetFernet:
         return request.param
 
     def test_get_fernet(self, mocks, password, ensure, password_correct):
+        get_fernet.cache_clear()
         getpass_mock, ptk_mock = mocks
 
         if password_correct:
@@ -89,6 +91,16 @@ class TestGetFernet:
 
         assert isinstance(fernet, Fernet)
         assert self._fernet_to_key(fernet) == KEY
+
+        assert isinstance(get_fernet, functools._lru_cache_wrapper)
+        get_fernet(password=password, ensure=ensure)
+
+        if password:
+            ptk_mock.assert_called_once_with("new-password")
+            getpass_mock.assert_not_called()
+        else:
+            ptk_mock.assert_called_once_with("typed-password")
+            getpass_mock.assert_called()
 
 
 @pytest.fixture(params=FILEPATHS)

@@ -1,6 +1,7 @@
 """Useful functions for the hole module."""
 
 import base64
+from functools import lru_cache
 from getpass import getpass
 from glob import glob
 from pathlib import Path
@@ -9,7 +10,6 @@ from typing import Union
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-
 
 _FileLike = Union[Path, str]
 
@@ -29,6 +29,7 @@ def password_to_aes_key(password: str) -> bytes:
     return base64.urlsafe_b64encode(digest.finalize())
 
 
+@lru_cache(maxsize=10)
 def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
     """Returns a `Fernet` object to encrypt and decrypt text.
 
@@ -56,6 +57,7 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
 
     key = password_to_aes_key(password)
     return Fernet(key)
+
 
 def ensure_filepath(filepath: _FileLike) -> Path:
     """Wrapper for `_ensure_filepath`. If the filepath detected is not the same as
