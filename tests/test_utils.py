@@ -16,9 +16,17 @@ PASSWORDS = [
     "a-fdiwkvnxoeokd",
     '12345/!"$%&/()=?¿*^¨:_;<>\\',
 ]
-
 KEY = b"KKSuP8aAubHTLcnHxY8dgTHYOTeqSll6Bqs_wdXwlFA="
 ROOT = Path(__file__).parent.parent.parent
+FILEPATHS = [
+    "file.txt",
+    "images/photo.png",
+    "folder/doc.pdf",
+    "4.txt",
+    "invalid.py",
+    Path("asdf.pdf"),
+    Path("a.jpg"),
+]
 
 
 @pytest.mark.parametrize("password", PASSWORDS)
@@ -83,9 +91,7 @@ class TestGetFernet:
         assert self._fernet_to_key(fernet) == KEY
 
 
-@pytest.fixture(
-    params=["file.txt", "images/photo.png", "folder/doc.pdf", "4.txt", "invalid.py"]
-)
+@pytest.fixture(params=FILEPATHS)
 def filepath(request):
     return request.param
 
@@ -97,21 +103,19 @@ def is_equal(request):
 
 @mock.patch("aes.utils._ensure_filepath")
 @mock.patch("aes.utils.Path")
-def test_ensure_filepath(
-    hidden_ensure_filepath_mock, path_mock, filepath, is_equal, capsys
-):
+def test_ensure_filepath(hef_m, path_mock, filepath, is_equal, capsys):
     path_mock.return_value.name = filepath
     if not is_equal:
-        hidden_ensure_filepath_mock.return_value.name = "a.txt"
+        hef_m.return_value.name = "a.txt"
     else:
-        hidden_ensure_filepath_mock.return_value.name = filepath
+        hef_m.return_value.name = filepath
 
     ensure_filepath(filepath)
 
     captured = capsys.readouterr()
 
     path_mock.assert_called_with(filepath)
-    hidden_ensure_filepath_mock.assert_called_with(filepath)
+    hef_m.assert_called_with(filepath)
 
     if not is_equal:
         assert captured.out == "Using path %r\n" % filepath

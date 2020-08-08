@@ -11,7 +11,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
 
-PathOrStr = Union[Path, str]
+_FileLike = Union[Path, str]
 
 
 def password_to_aes_key(password: str) -> bytes:
@@ -57,13 +57,12 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
     key = password_to_aes_key(password)
     return Fernet(key)
 
-
-def ensure_filepath(filepath: str) -> Path:
+def ensure_filepath(filepath: _FileLike) -> Path:
     """Wrapper for `_ensure_filepath`. If the filepath detected is not the same as
     the `filepath` argument, a warning will be printed to stdout.
 
     Args:
-        filepath (str): filepath.
+        filepath (_FileLike): filepath.
 
     Returns:
         Path: ensured filepath.
@@ -75,13 +74,13 @@ def ensure_filepath(filepath: str) -> Path:
     return path
 
 
-def _ensure_filepath(filepath: PathOrStr) -> Path:
+def _ensure_filepath(filepath: _FileLike) -> Path:
     """Ensures a filepath. If the filepath exists, that filepath is returned.
     However if it doesn't exist, this function will try to find a file using
     the `*` glob pattern.
 
     Args:
-        filepath (PathOrStr): filepath to start the search.
+        filepath (_FileLike): filepath to start the search.
 
     Raises:
         ValueError: if `filepath` doesn't exist and no file is found using
