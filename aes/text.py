@@ -4,8 +4,8 @@ from typing import Union
 
 from cryptography.fernet import InvalidToken
 
-from aes.exceptions import IncorrectPasswordError
-from aes.utils import get_fernet
+from .exceptions import IncorrectPasswordError
+from .utils import get_fernet
 
 StrOrBytes = Union[str, bytes]
 

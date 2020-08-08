@@ -25,42 +25,40 @@ def text(request):
 
 
 class TestFileEncrypt:
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def mocks(self):
-        ensure_filepath_mock = mock.patch("aes.files.ensure_filepath").start()
-        encrypt_text_mock = mock.patch("aes.files.encrypt_text").start()
+        self.enctext_m = mock.patch("aes.files.encrypt_text").start()
+        self.path_m = mock.patch("aes.files.Path").start()
 
-        yield ensure_filepath_mock, encrypt_text_mock
+        yield
 
         mock.patch.stopall()
 
-    def test_encrypt(self, filepath, password, text, mocks):
-        ensure_filepath_mock, encrypt_text_mock = mocks
-        ensure_filepath_mock.return_value.read_bytes.return_value = text
+    def test_encrypt(self, filepath, password, text):
+        self.path_m.return_value.read_bytes.return_value = text
         encrypt_file(filepath=filepath, password=password)
 
-        encrypt_text_mock.assert_called_once_with(text=text, password=password)
-        ensure_filepath_mock.assert_called_once_with(filepath)
-        ensure_filepath_mock.return_value.read_bytes.assert_called_once_with()
-        ensure_filepath_mock.return_value.write_bytes.assert_called_once()
+        self.enctext_m.assert_called_once_with(text=text, password=password)
+        self.path_m.assert_called_once_with(filepath)
+        self.path_m.return_value.read_bytes.assert_called_once_with()
+        self.path_m.return_value.write_bytes.assert_called_once()
 
 
 class TestFileDecrypt:
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def mocks(self):
-        ensure_filepath_mock = mock.patch("aes.files.ensure_filepath").start()
-        decrypt_text_mock = mock.patch("aes.files.decrypt_text").start()
+        self.decrtext_m = mock.patch("aes.files.decrypt_text").start()
+        self.path_m = mock.patch("aes.files.Path").start()
 
-        yield ensure_filepath_mock, decrypt_text_mock
+        yield
 
         mock.patch.stopall()
 
-    def test_decrypt(self, filepath, password, text, mocks):
-        ensure_filepath_mock, decrypt_text_mock = mocks
-        ensure_filepath_mock.return_value.read_bytes.return_value = text
+    def test_decrypt(self, filepath, password, text):
+        self.path_m.return_value.read_bytes.return_value = text
         decrypt_file(filepath=filepath, password=password)
 
-        decrypt_text_mock.assert_called_once_with(text=text, password=password)
-        ensure_filepath_mock.assert_called_once_with(filepath)
-        ensure_filepath_mock.return_value.read_bytes.assert_called_once_with()
-        ensure_filepath_mock.return_value.write_bytes.assert_called_once()
+        self.decrtext_m.assert_called_once_with(text=text, password=password)
+        self.path_m.assert_called_once_with(filepath)
+        self.path_m.return_value.read_bytes.assert_called_once_with()
+        self.path_m.return_value.write_bytes.assert_called_once()

@@ -6,7 +6,7 @@
     {
       "label": "Git Clean",
       "type": "shell",
-      "command": "git clean -fdx -e venv -e .idea -e TODO.MD -e .vscode -e *.spec",
+      "command": "git clean -fdx -e venv -e .idea -e TODO.MD -e .vscode -e *.spec -e *.egg-info/",
       "problemMatcher": []
     },
     {
@@ -14,7 +14,7 @@
       "type": "shell",
       "command": "${config:python.pythonPath} -m coverage run -m pytest -vv -l & ${config:python.pythonPath} -m coverage html & chrome.exe ${workspaceFolder}\\htmlcov\\index.html",
       "problemMatcher": [],
-      "dependsOn": ["Git Clean"]
+      // "dependsOn": ["Git Clean"]
     },
     {
       "label": "Check code",

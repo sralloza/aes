@@ -115,15 +115,15 @@ class TestMain:
         assert captured.out == expected
         assert captured.err == ""
 
-    @mock.patch("aes.main.encrypt_file")
-    def test_encrypt_file_good(self, encrypt_mock):
+    @mock.patch("aes.main.encrypt_from_path")
+    def test_encrypt_from_path_good(self, encrypt_m):
         self.set_args(command="encrypt", path="filepath")
         main()
-        encrypt_mock.assert_called_once_with("filepath")
+        encrypt_m.assert_called_once_with("filepath")
 
-    @mock.patch("aes.main.encrypt_file")
-    def test_encrypt_file_encryption_error(self, encrypt_mock, capsys):
-        encrypt_mock.side_effect = InvalidToken
+    @mock.patch("aes.main.encrypt_from_path")
+    def test_encrypt_from_path_encryption_error(self, encrypt_m, capsys):
+        encrypt_m.side_effect = InvalidToken
 
         with pytest.raises(SystemExit, match="1"):
             self.set_args(command="encrypt", path="filepath")
@@ -133,10 +133,10 @@ class TestMain:
         assert "Invalid password" in captured.err
         assert captured.out == ""
 
-        encrypt_mock.assert_called_once_with("filepath")
+        encrypt_m.assert_called_once_with("filepath")
 
-    @mock.patch("aes.main.encrypt_file")
-    def test_encrypt_file_value_error(self, encrypt_mock, capsys):
+    @mock.patch("aes.main.encrypt_from_path")
+    def test_encrypt_from_path_value_error(self, encrypt_mock, capsys):
         encrypt_mock.side_effect = ValueError
 
         with pytest.raises(SystemExit, match="1"):
@@ -148,15 +148,15 @@ class TestMain:
         assert captured.out == ""
         encrypt_mock.assert_called_once_with("filepath")
 
-    @mock.patch("aes.main.decrypt_file")
-    def test_decrypt_file_good(self, decrypt_mock):
+    @mock.patch("aes.main.decrypt_from_path")
+    def test_decrypt_from_path_good(self, decrypt_m):
         self.set_args(command="decrypt", path="filepath")
         main()
-        decrypt_mock.assert_called_once_with("filepath")
+        decrypt_m.assert_called_once_with("filepath")
 
-    @mock.patch("aes.main.decrypt_file")
-    def test_decrypt_file_decryption_error(self, decrypt_mock, capsys):
-        decrypt_mock.side_effect = InvalidToken
+    @mock.patch("aes.main.decrypt_from_path")
+    def test_decrypt_from_path_decryption_error(self, decrypt_m, capsys):
+        decrypt_m.side_effect = InvalidToken
 
         with pytest.raises(SystemExit, match="1"):
             self.set_args(command="decrypt", path="filepath")
@@ -165,11 +165,11 @@ class TestMain:
         captured = capsys.readouterr()
         assert "Invalid password" in captured.err
         assert captured.out == ""
-        decrypt_mock.assert_called_once_with("filepath")
+        decrypt_m.assert_called_once_with("filepath")
 
-    @mock.patch("aes.main.decrypt_file")
-    def test_decrypt_file_value_error(self, decrypt_mock, capsys):
-        decrypt_mock.side_effect = ValueError
+    @mock.patch("aes.main.decrypt_from_path")
+    def test_decrypt_from_path_value_error(self, decrypt_m, capsys):
+        decrypt_m.side_effect = ValueError
 
         with pytest.raises(SystemExit, match="1"):
             self.set_args(command="decrypt", path="filepath")
@@ -178,7 +178,7 @@ class TestMain:
         captured = capsys.readouterr()
         assert "Error:" in captured.err
         assert captured.out == ""
-        decrypt_mock.assert_called_once_with("filepath")
+        decrypt_m.assert_called_once_with("filepath")
 
     def test_invalid_command(self):
         with pytest.raises(ValueError, match="is not a valid command"):

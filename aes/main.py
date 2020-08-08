@@ -7,7 +7,7 @@ from typing import NoReturn
 from cryptography.fernet import InvalidToken
 
 from . import __version__
-from .files import decrypt_file, encrypt_file
+from .general import decrypt_from_path, encrypt_from_path
 
 
 class Parser:
@@ -56,6 +56,10 @@ def main():
 
     Raises:
         ValueError: if `Parser.parse_args` returns an invalid command.
+
+    Returns:
+        None: None is always returned.
+
     """
 
     options = Parser.parse_args()
@@ -64,9 +68,9 @@ def main():
         print("Version: %r" % __version__)
         sys.exit(0)
 
-    elif options["command"] == "decrypt":
+    if options["command"] == "decrypt":
         try:
-            decrypt_file(options["path"])
+            return decrypt_from_path(options["path"])
         except InvalidToken:
             print("Invalid password", file=sys.stderr)
             sys.exit(1)
@@ -74,9 +78,9 @@ def main():
             arg = err.args[0] if err.args else ""
             print("Error: " + arg, file=sys.stderr)
             sys.exit(1)
-    elif options["command"] == "encrypt":
+    if options["command"] == "encrypt":
         try:
-            encrypt_file(options["path"])
+            return encrypt_from_path(options["path"])
         except InvalidToken:
             print("Invalid password", file=sys.stderr)
             sys.exit(1)
@@ -84,6 +88,6 @@ def main():
             arg = err.args[0] if err.args else ""
             print("Error: " + arg, file=sys.stderr)
             sys.exit(1)
-    else:
-        msg = f"{options['command']!r} is not a valid command"
-        raise ValueError(msg)
+
+    msg = f"{options['command']!r} is not a valid command"
+    raise ValueError(msg)
