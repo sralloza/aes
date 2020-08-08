@@ -1,36 +1,39 @@
 """Module to manage file encryption."""
 
-from aes.text import encrypt_text, decrypt_text
-from aes.utils import ensure_filepath
+from pathlib import Path
+from typing import Union
+
+from aes.text import decrypt_text, encrypt_text
+
+_FileLike = Union[str, Path]
 
 
-def encrypt_file(filepath: str, password: str = None):
+def encrypt_file(filepath: _FileLike, password: str = None):
     """Encrypts a file.
 
     Args:
-        filepath (str): filepath of the file.
+        filepath (_FileLike): filepath of the file. It must exist.
         password (str, optional): password to encrypt the file. If None,
             the user will have to type it. Defaults to None.
     """
 
-    path = ensure_filepath(filepath)
-
+    path = Path(filepath)
     decrypted = path.read_bytes()
     encrypted = encrypt_text(text=decrypted, password=password)
 
     path.write_bytes(encrypted)
 
 
-def decrypt_file(filepath: str, password: str = None):
+def decrypt_file(filepath: _FileLike, password: str = None):
     """Decrypts a file.
 
     Args:
-        filepath (str): filepath of the file.
+        filepath (_FileLike): filepath of the file. It must exist.
         password (str, optional): password to decrypt the file. If None,
             the user will have to type it. Defaults to None.
     """
 
-    path = ensure_filepath(filepath)
+    path = Path(filepath)
 
     encrypted = path.read_bytes()
     decrypted = decrypt_text(text=encrypted, password=password)
