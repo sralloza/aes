@@ -26,7 +26,6 @@
         "pylint module",
         "pylint tests"
       ],
-      "dependsOrder": "sequence"
     },
     {
       "label": "pylint module",
