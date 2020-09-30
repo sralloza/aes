@@ -53,8 +53,8 @@ class TestGetFernet:
         getpass_mock = mock.patch("aes.utils.getpass").start()
         ptk_mock = mock.patch("aes.utils.password_to_aes_key", return_value=KEY).start()
 
-        assert hasattr(_InternalMemory, "_saved_password")
-        _InternalMemory._saved_password = None
+        assert hasattr(_InternalMemory, "saved_password")
+        _InternalMemory.saved_password = None
 
         yield getpass_mock, ptk_mock
 
@@ -96,7 +96,7 @@ class TestGetFernet:
         get_fernet.cache_clear()
 
         if not password:
-            assert _InternalMemory._saved_password is not None
+            assert _InternalMemory.saved_password is not None
 
         fernet_2 = get_fernet(password=password, ensure=ensure)
 

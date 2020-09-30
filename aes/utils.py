@@ -18,7 +18,7 @@ _FileLike = Union[Path, str]
 
 
 class _InternalMemory:
-    _saved_password: Optional[str] = None
+    saved_password: Optional[str] = None
 
 
 def password_to_aes_key(password: str) -> bytes:
@@ -55,7 +55,7 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
     """
 
     if not password:
-        if not _InternalMemory._saved_password:
+        if not _InternalMemory.saved_password:
             password = getpass("AES password: ")
             if ensure:
                 password2 = getpass("Repeat password: ")
@@ -63,10 +63,9 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
                 if password != password2:
                     raise PasswordsMismatchError("Error: passwords do not match")
 
-            _InternalMemory._saved_password = password
+            _InternalMemory.saved_password = password
         else:
-            password = _InternalMemory._saved_password
-
+            password = _InternalMemory.saved_password
 
     key = password_to_aes_key(password)
     return Fernet(key)
