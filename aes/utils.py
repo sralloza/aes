@@ -6,6 +6,7 @@ from getpass import getpass
 from glob import glob
 from pathlib import Path
 from typing import Union
+from typing import Optional
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
@@ -14,6 +15,10 @@ from cryptography.hazmat.primitives import hashes
 from .exceptions import FilepathError, PasswordsMismatchError
 
 _FileLike = Union[Path, str]
+
+
+class _InternalMemory:
+    _saved_password: Optional[str] = None
 
 
 def password_to_aes_key(password: str) -> bytes:
@@ -50,12 +55,18 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
     """
 
     if not password:
-        password = getpass("AES password: ")
-        if ensure:
-            password2 = getpass("Repeat password: ")
+        if not _InternalMemory._saved_password:
+            password = getpass("AES password: ")
+            if ensure:
+                password2 = getpass("Repeat password: ")
 
-            if password != password2:
-                raise PasswordsMismatchError("Error: passwords do not match")
+                if password != password2:
+                    raise PasswordsMismatchError("Error: passwords do not match")
+
+            _InternalMemory._saved_password = password
+        else:
+            password = _InternalMemory._saved_password
+
 
     key = password_to_aes_key(password)
     return Fernet(key)
