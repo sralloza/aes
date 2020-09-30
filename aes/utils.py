@@ -11,7 +11,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
-from .exceptions import PasswordsMismatchError
+from .exceptions import FilepathError, PasswordsMismatchError
 
 _FileLike = Union[Path, str]
 
@@ -42,7 +42,7 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
             to input the password twice. Defaults to True.
 
     Raises:
-        ValueError: If `password` is None, `ensure` is True and the two input passwords
+        PasswordsMismatchError: If `password` is None, `ensure` is True and the two input passwords
             doesn't match.
 
     Returns:
@@ -87,7 +87,7 @@ def _ensure_filepath(filepath: _FileLike) -> Path:
         filepath (_FileLike): filepath to start the search.
 
     Raises:
-        PasswordsMismatchError: if `filepath` doesn't exist and no file is found using
+        FilepathError: if `filepath` doesn't exist and no file is found using
             the glob pattern.
 
     Returns:
@@ -110,5 +110,5 @@ def _ensure_filepath(filepath: _FileLike) -> Path:
         if len(possible) == 1:
             return Path(possible[0])
 
-        raise ValueError("Invalid filepath: %s" % filepath)
+        raise FilepathError("Invalid filepath: %s" % filepath)
     return path
