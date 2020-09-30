@@ -1,7 +1,9 @@
 """Exceptions used in this module."""
 
+import click
 
-class BaseAESError(Exception):
+
+class BaseAESError(click.ClickException):
     """Base AES error."""
 
 
