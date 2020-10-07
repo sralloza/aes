@@ -45,3 +45,18 @@ def decrypt_from_path(input_path: str, password: str = None):
 
     filepath = ensure_filepath(path)
     return decrypt_file(filepath, password)
+
+
+def temp_open(input_path: str, password: str = None):
+    """Decrypts a file or folder and after the user presses a key encrypts it again.
+
+    Args:
+        input_path (str): pattern to encrypt. Can be a folder too.
+        password (str, optional): password to encrypt the file. If None,
+            the user will have to type it. Defaults to None.
+    """
+
+    decrypt_from_path(input_path, password)
+    click.echo("Press key to encrypt again")
+    click.getchar()
+    encrypt_from_path(input_path, password)

@@ -1,8 +1,7 @@
 from unittest import mock
 
 import pytest
-
-from aes.general import decrypt_from_path, encrypt_from_path
+from aes.general import decrypt_from_path, encrypt_from_path, temp_open
 
 
 class TestEncryptFromPath:
@@ -69,3 +68,25 @@ class TestDecryptFromPath:
             self.decr_file_m.assert_called_once_with(
                 self.ens_filepath_m.return_value, password
             )
+
+
+class TestTempOpen:
+    def middle(self):
+        self.efp_m.assert_not_called()
+        self.dfp_m.assert_called_once_with("filepath", "password")
+
+    @pytest.fixture(autouse=True)
+    def mocks(self):
+        self.efp_m = mock.patch("aes.general.encrypt_from_path").start()
+        self.dfp_m = mock.patch("aes.general.decrypt_from_path").start()
+        self.getchar_m = mock.patch("aes.general.click.getchar").start()
+        self.getchar_m.side_effect = self.middle
+
+        yield
+        mock.patch.stopall()
+
+    def test_temp_open(self):
+        temp_open("filepath", "password")
+        self.efp_m.assert_called_once_with("filepath", "password")
+        self.dfp_m.assert_called_once_with("filepath", "password")
+        self.getchar_m.assert_called_once()

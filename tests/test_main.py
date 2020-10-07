@@ -101,6 +101,17 @@ def test_decrypt_from_path_value_error(decrypt_m):
     decrypt_m.assert_called_once_with("filepath")
 
 
+@mock.patch("aes.main.temp_open")
+def test_temp_open(temp_open_m):
+    runner = CliRunner()
+    result = runner.invoke(cli, ["open", "filepath"])
+
+    assert result.exit_code == 0
+    assert result.output == ""
+
+    temp_open_m.assert_called_once_with("filepath")
+
+
 @mock.patch("aes.main.cli")
 def test_main(cli_m):
     main()
