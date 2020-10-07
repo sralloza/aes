@@ -54,4 +54,4 @@ def decrypt_text(text: StrOrBytes, password: str = None) -> bytes:
     try:
         return fernet.decrypt(text)
     except InvalidToken as exc:
-        raise IncorrectPasswordError from exc
+        raise IncorrectPasswordError("Incorrect password") from exc

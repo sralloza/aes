@@ -3,10 +3,17 @@ import functools
 from pathlib import Path
 from unittest import mock
 
-import pytest
 from cryptography.fernet import Fernet
+import pytest
 
-from aes.utils import _ensure_filepath, password_to_aes_key, get_fernet, ensure_filepath
+from aes.exceptions import FilepathError, PasswordsMismatchError
+from aes.utils import (
+    _InternalMemory,
+    _ensure_filepath,
+    ensure_filepath,
+    get_fernet,
+    password_to_aes_key,
+)
 
 # pylint: disable=redefined-outer-name,protected-access
 
@@ -46,6 +53,9 @@ class TestGetFernet:
         getpass_mock = mock.patch("aes.utils.getpass").start()
         ptk_mock = mock.patch("aes.utils.password_to_aes_key", return_value=KEY).start()
 
+        assert hasattr(_InternalMemory, "saved_password")
+        _InternalMemory.saved_password = None
+
         yield getpass_mock, ptk_mock
 
         mock.patch.stopall()
@@ -72,35 +82,43 @@ class TestGetFernet:
             getpass_mock.side_effect = ["typed-password", "wrong-password"]
 
         if not password_correct and ensure and not password:
-            with pytest.raises(ValueError, match="Error: passwords do not match"):
+            with pytest.raises(
+                PasswordsMismatchError, match="Error: passwords do not match"
+            ):
                 get_fernet(password=password, ensure=ensure)
             return
 
-        fernet = get_fernet(password=password, ensure=ensure)
+        fernet_1 = get_fernet(password=password, ensure=ensure)
+        cache_info = get_fernet.cache_info()
+        assert cache_info.hits == 0
+        assert cache_info.misses == 1
+        assert cache_info.currsize == 1
+        get_fernet.cache_clear()
+
+        if not password:
+            assert _InternalMemory.saved_password is not None
+
+        fernet_2 = get_fernet(password=password, ensure=ensure)
+
+        assert isinstance(fernet_1, Fernet)
+        assert isinstance(fernet_2, Fernet)
+        assert self._fernet_to_key(fernet_1) == KEY
+        assert self._fernet_to_key(fernet_2) == KEY
+
+        assert isinstance(get_fernet, functools._lru_cache_wrapper)
 
         if password:
-            ptk_mock.assert_called_once_with("new-password")
+            ptk_mock.assert_any_call("new-password")
+            assert ptk_mock.call_count == 2
             getpass_mock.assert_not_called()
         else:
-            ptk_mock.assert_called_once_with("typed-password")
+            ptk_mock.assert_any_call("typed-password")
+            assert ptk_mock.call_count == 2
             getpass_mock.assert_called()
 
         if ensure and not password:
             getpass_mock.assert_called()
             assert getpass_mock.call_count == 2
-
-        assert isinstance(fernet, Fernet)
-        assert self._fernet_to_key(fernet) == KEY
-
-        assert isinstance(get_fernet, functools._lru_cache_wrapper)
-        get_fernet(password=password, ensure=ensure)
-
-        if password:
-            ptk_mock.assert_called_once_with("new-password")
-            getpass_mock.assert_not_called()
-        else:
-            ptk_mock.assert_called_once_with("typed-password")
-            getpass_mock.assert_called()
 
 
 @pytest.fixture(params=FILEPATHS)
@@ -157,5 +175,5 @@ class TestHiddenEnsureFilepath:
         assert returned_filepath == data_path.joinpath("photo-17.jpg")
 
     def test_file_not_exist_fatal_error(self, data_path):
-        with pytest.raises(ValueError, match="Invalid filepath"):
+        with pytest.raises(FilepathError, match="Invalid filepath"):
             _ensure_filepath(data_path.joinpath("invalid.py"))

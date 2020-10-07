@@ -6,12 +6,19 @@ from getpass import getpass
 from glob import glob
 from pathlib import Path
 from typing import Union
+from typing import Optional
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
+from .exceptions import FilepathError, PasswordsMismatchError
+
 _FileLike = Union[Path, str]
+
+
+class _InternalMemory:
+    saved_password: Optional[str] = None
 
 
 def password_to_aes_key(password: str) -> bytes:
@@ -40,7 +47,7 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
             to input the password twice. Defaults to True.
 
     Raises:
-        ValueError: If `password` is None, `ensure` is True and the two input passwords
+        PasswordsMismatchError: If `password` is None, `ensure` is True and the two input passwords
             doesn't match.
 
     Returns:
@@ -48,12 +55,17 @@ def get_fernet(password: str = None, ensure: bool = True) -> Fernet:
     """
 
     if not password:
-        password = getpass("AES password: ")
-        if ensure:
-            password2 = getpass("Repeat password: ")
+        if not _InternalMemory.saved_password:
+            password = getpass("AES password: ")
+            if ensure:
+                password2 = getpass("Repeat password: ")
 
-            if password != password2:
-                raise ValueError("Error: passwords do not match")
+                if password != password2:
+                    raise PasswordsMismatchError("Error: passwords do not match")
+
+            _InternalMemory.saved_password = password
+        else:
+            password = _InternalMemory.saved_password
 
     key = password_to_aes_key(password)
     return Fernet(key)
@@ -85,7 +97,7 @@ def _ensure_filepath(filepath: _FileLike) -> Path:
         filepath (_FileLike): filepath to start the search.
 
     Raises:
-        ValueError: if `filepath` doesn't exist and no file is found using
+        FilepathError: if `filepath` doesn't exist and no file is found using
             the glob pattern.
 
     Returns:
@@ -108,5 +120,5 @@ def _ensure_filepath(filepath: _FileLike) -> Path:
         if len(possible) == 1:
             return Path(possible[0])
 
-        raise ValueError("Invalid filepath: %s" % filepath)
+        raise FilepathError("Invalid filepath: %s" % filepath)
     return path
