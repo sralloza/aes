@@ -6,9 +6,10 @@ import click
 from cryptography.fernet import InvalidToken
 
 from . import __version__
-from .general import decrypt_from_path, encrypt_from_path, temp_decrypt
+from .general import decrypt_from_path, encrypt_from_path, temp_open
 
 # pylint: disable=missing-docstring
+
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.version_option(version=__version__)
@@ -40,7 +41,11 @@ def encrypt_command(path):
     return wrapper(encrypt_from_path, path)
 
 
+@cli.command("open")
+@click.argument("path")
+def open_command(path):
+    return wrapper(temp_open, path)
 
 
 def main():
-    return cli(prog_name="aes") # pylint: disable=unexpected-keyword-arg
+    return cli(prog_name="aes")  # pylint: disable=unexpected-keyword-arg

@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import click
+
 from .files import decrypt_file, encrypt_file
 from .folder import decrypt_folder, encrypt_folder
 from .utils import ensure_filepath
