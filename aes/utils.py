@@ -5,9 +5,9 @@ from functools import lru_cache
 from getpass import getpass
 from glob import glob
 from pathlib import Path
-from typing import Union
-from typing import Optional
+from typing import Optional, Union
 
+import click
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -122,3 +122,20 @@ def _ensure_filepath(filepath: _FileLike) -> Path:
 
         raise FilepathError("Invalid filepath: %s" % filepath)
     return path
+
+
+def check_write_access(filepath: Path):
+    """Checks that the program can write safely in a file.
+
+    Args:
+        filepath (Path): file to check write permissions.
+
+    Raises:
+        click.ClickException: if the file raises PermissionError.
+    """
+
+    try:
+        with filepath.open("a"):
+            pass
+    except PermissionError as exc:
+        raise click.ClickException("Error writing to %r" % filepath.as_posix()) from exc

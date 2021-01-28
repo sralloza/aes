@@ -2,6 +2,7 @@ import base64
 import functools
 from pathlib import Path
 from unittest import mock
+from click.exceptions import ClickException
 
 from cryptography.fernet import Fernet
 import pytest
@@ -10,6 +11,7 @@ from aes.exceptions import FilepathError, PasswordsMismatchError
 from aes.utils import (
     _InternalMemory,
     _ensure_filepath,
+    check_write_access,
     ensure_filepath,
     get_fernet,
     password_to_aes_key,
@@ -177,3 +179,17 @@ class TestHiddenEnsureFilepath:
     def test_file_not_exist_fatal_error(self, data_path):
         with pytest.raises(FilepathError, match="Invalid filepath"):
             _ensure_filepath(data_path.joinpath("invalid.py"))
+
+
+def test_check_write_access():
+    file_1 = mock.MagicMock()
+    file_1.open.side_effect = PermissionError
+
+    with pytest.raises(ClickException):
+        check_write_access(file_1)
+    file_1.open.assert_called_once()
+
+    file_2 = mock.MagicMock()
+
+    check_write_access(file_2)
+    file_2.open.assert_called_once()
